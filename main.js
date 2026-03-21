@@ -150,29 +150,41 @@ function fmt(s) {
  * el estado inactivo con el botón de carga.
  */
 function loadColorAudio(idx) {
-  const stored   = audioStore[idx];
-  const idle     = document.getElementById('colorAudioIdle');
-  const player   = document.getElementById('colorAudioPlayer');
-  const capPlay  = document.getElementById('capPlayBtn');
+  const stored    = audioStore[idx];
+  const idle      = document.getElementById('colorAudioIdle');
+  const player    = document.getElementById('colorAudioPlayer');
+  const capPlay   = document.getElementById('capPlayBtn');
   const capNameEl = document.getElementById('capName');
-  const capTime  = document.getElementById('capTime');
-  const capProg  = document.getElementById('capProgress');
+  const capTime   = document.getElementById('capTime');
+  const capProg   = document.getElementById('capProgress');
 
-  // Detener cualquier audio activo
-  if (!capAudioEl.paused) capAudioEl.pause();
+  // Detener y destruir el audio anterior
+  if (capAudioEl) {
+    capAudioEl.pause();
+    capAudioEl.src = '';
+    capAudioEl.load();
+  }
   stopWave();
   capPlay.textContent = '▶';
   capPlay.classList.remove('playing');
 
   if (stored) {
-    idle.style.display   = 'none';
-    player.style.display = 'flex';
+    // ── Crear un Audio() NUEVO en cada interacción ──
+    // iOS solo permite reproducción si el objeto se crea dentro
+    // de un evento de toque directo del usuario.
+    capAudioEl = new Audio();
+    capAudioEl.preload = 'none'; // evita descarga automática en móviles
+    capAudioEl.src = stored.url;
+
+    // Reasignar eventos al nuevo elemento
+    capAudioEl.addEventListener('timeupdate', onTimeUpdate);
+    capAudioEl.addEventListener('ended', onAudioEnded);
+
+    idle.style.display    = 'none';
+    player.style.display  = 'flex';
     capNameEl.textContent = stored.name;
-    capAudioEl.src        = stored.url;
-    capAudioEl.currentTime = 0;
-    capAudioEl.load();
-    capTime.textContent  = '0:00 / 0:00';
-    capProg.style.width  = '0%';
+    capTime.textContent   = '0:00 / 0:00';
+    capProg.style.width   = '0%';
   } else {
     idle.style.display   = 'flex';
     player.style.display = 'none';
@@ -235,19 +247,55 @@ function buildSwatches() {
 }
 
 /* ══════════════════════════════════════
+   HANDLERS DE AUDIO (nombrados para
+   poder reasignarlos al nuevo Audio())
+══════════════════════════════════════ */
+function onTimeUpdate() {
+  if (!capAudioEl.duration) return;
+  const pct = (capAudioEl.currentTime / capAudioEl.duration) * 100;
+  document.getElementById('capProgress').style.width = pct + '%';
+  document.getElementById('capTime').textContent =
+    fmt(capAudioEl.currentTime) + ' / ' + fmt(capAudioEl.duration);
+}
+
+function onAudioEnded() {
+  document.getElementById('capPlayBtn').textContent = '▶';
+  document.getElementById('capPlayBtn').classList.remove('playing');
+  stopWave();
+  document.getElementById('capProgress').style.width = '0%';
+}
+
+/* ══════════════════════════════════════
    EVENTOS DEL REPRODUCTOR
 ══════════════════════════════════════ */
-
 function initPlayerEvents() {
+
   // Botón play / pausa
   document.getElementById('capPlayBtn').addEventListener('click', () => {
     if (capActiveIdx < 0 || !audioStore[capActiveIdx]) return;
     const btn = document.getElementById('capPlayBtn');
+
     if (capAudioEl.paused) {
-      capAudioEl.play();
-      btn.textContent = '⏸';
-      btn.classList.add('playing');
-      animateWave(palette[capActiveIdx].color);
+      // iOS: play() devuelve una Promise — hay que manejarla
+      const playPromise = capAudioEl.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            btn.textContent = '⏸';
+            btn.classList.add('playing');
+            animateWave(palette[capActiveIdx].color);
+          })
+          .catch(() => {
+            // iOS bloqueó la reproducción — informar al usuario
+            btn.textContent = '▶';
+            btn.classList.remove('playing');
+            console.warn('iOS bloqueó la reproducción automática.');
+          });
+      } else {
+        btn.textContent = '⏸';
+        btn.classList.add('playing');
+        animateWave(palette[capActiveIdx].color);
+      }
     } else {
       capAudioEl.pause();
       btn.textContent = '▶';
@@ -263,28 +311,9 @@ function initPlayerEvents() {
     capAudioEl.currentTime = ((e.clientX - rect.left) / rect.width) * capAudioEl.duration;
   });
 
-  // Actualización de progreso en tiempo real
-  capAudioEl.addEventListener('timeupdate', () => {
-    if (!capAudioEl.duration) return;
-    const pct = (capAudioEl.currentTime / capAudioEl.duration) * 100;
-    document.getElementById('capProgress').style.width = pct + '%';
-    document.getElementById('capTime').textContent =
-      fmt(capAudioEl.currentTime) + ' / ' + fmt(capAudioEl.duration);
-  });
-
-  // Fin de reproducción
-  capAudioEl.addEventListener('ended', () => {
-    document.getElementById('capPlayBtn').textContent = '▶';
-    document.getElementById('capPlayBtn').classList.remove('playing');
-    stopWave();
-    document.getElementById('capProgress').style.width = '0%';
-  });
-
-  // Botones de carga de audio — ya no se usan (audios fijos)
-  // Si en el futuro quieres restaurar la carga manual, descomenta estas líneas:
+  // Botones de carga de audio — desactivados (audios fijos)
+  // Si en el futuro quieres restaurar la carga manual, descomenta:
   // document.getElementById('colorUploadBtn').addEventListener('click', triggerColorUpload);
-  // document.getElementById('capChangeBtn').addEventListener('click', triggerColorUpload);
-  // document.getElementById('colorAudioInput').addEventListener('change', ...);
 }
 
 /* ══════════════════════════════════════
@@ -304,38 +333,37 @@ function initArtwork() {
 /* ══════════════════════════════════════
    AUDIOS — rutas fijas desde /sounds
    Nombra tus archivos exactamente así:
-   sounds/color-1.mp3 → Lino Claro
-   sounds/color-2.mp3 → Ocre Tostado
-   sounds/color-3.mp3 → Negro Profundo
-   sounds/color-4.mp3 → Azul Grisáceo
-   sounds/color-5.mp3 → Azul Sajón
-   sounds/color-6.mp3 → Oro Apagado
-   sounds/color-7.mp3 → Umber Cálido
-   sounds/color-8.mp3 → Gris Verdoso
-   sounds/color-9.mp3 → Oliva Oscuro
+   sounds/color-1.mp3  → Lino Claro
+   sounds/color-2.mp3  → Ocre Tostado
+   sounds/color-3.mp3  → Negro Profundo
+   sounds/color-4.mp3  → Azul Grisáceo
+   sounds/color-5.mp3  → Azul Sajón
+   sounds/color-6.mp3  → Oro Apagado
+   sounds/color-7.mp3  → Umber Cálido
+   sounds/color-8.mp3  → Gris Verdoso
+   sounds/color-9.mp3  → Oliva Oscuro
    sounds/color-10.mp3 → Azul Noche
 ══════════════════════════════════════ */
 const audioFiles = [
-  { file: 'sounds/color-1.mp3',  name: 'Lino Claro'     },
-  { file: 'sounds/color-2.mp3',  name: 'Ocre Tostado'   },
-  { file: 'sounds/color-3.mp3',  name: 'Negro Profundo'  },
-  { file: 'sounds/color-4.mp3',  name: 'Azul Grisáceo'  },
-  { file: 'sounds/color-5.mp3',  name: 'Azul Sajón'     },
-  { file: 'sounds/color-6.mp3',  name: 'Oro Apagado'    },
-  { file: 'sounds/color-7.mp3',  name: 'Umber Cálido'   },
-  { file: 'sounds/color-8.mp3',  name: 'Gris Verdoso'   },
-  { file: 'sounds/color-9.mp3',  name: 'Oliva Oscuro'   },
-  { file: 'sounds/color-10.mp3', name: 'Azul Noche'     },
+  { file: 'sounds/color-1.mp3',  name: 'Lino Claro'    },
+  { file: 'sounds/color-2.mp3',  name: 'Ocre Tostado'  },
+  { file: 'sounds/color-3.mp3',  name: 'Negro Profundo' },
+  { file: 'sounds/color-4.mp3',  name: 'Azul Grisáceo' },
+  { file: 'sounds/color-5.mp3',  name: 'Azul Sajón'    },
+  { file: 'sounds/color-6.mp3',  name: 'Oro Apagado'   },
+  { file: 'sounds/color-7.mp3',  name: 'Umber Cálido'  },
+  { file: 'sounds/color-8.mp3',  name: 'Gris Verdoso'  },
+  { file: 'sounds/color-9.mp3',  name: 'Oliva Oscuro'  },
+  { file: 'sounds/color-10.mp3', name: 'Azul Noche'    },
 ];
 
+/* iOS requiere que el Audio se cree y reproduzca dentro de un
+   evento de toque directo. Por eso NO precargamos aquí —
+   capAudioEl se inicializa al primer toque del usuario.        */
 function preloadAudios() {
+  // Solo registramos los metadatos; el Audio() real se crea en loadColorAudio()
   audioFiles.forEach((a, i) => {
-    // Precarga cada audio; si el archivo existe lo registra en audioStore
-    const tester = new Audio();
-    tester.addEventListener('canplaythrough', () => {
-      audioStore[i] = { url: a.file, name: a.name };
-    }, { once: true });
-    tester.src = a.file;
+    audioStore[i] = { url: a.file, name: a.name };
   });
 }
 
