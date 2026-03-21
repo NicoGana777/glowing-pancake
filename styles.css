@@ -280,7 +280,7 @@ section{padding:5rem 2rem;position:relative}
   max-height:0;opacity:0;
   transition:max-height .6s cubic-bezier(0.4,0,0.2,1),opacity .4s,padding .4s;
 }
-.curiosity-panel.open{max-height:500px;opacity:1}
+.curiosity-panel.open{max-height:1200px;opacity:1}
 .curiosity-inner{padding:2rem 2.5rem}
 .curiosity-color-bar{height:4px;width:100%;transition:background .4s}
 .curiosity-label{
@@ -470,8 +470,18 @@ footer strong{font-style:normal;color:var(--gold);font-weight:400}
 }
 
 @media(max-width:700px){
-  .curiosity-top{grid-template-columns:1fr}
-  .color-audio-block{margin-top:.5rem}
+  /* Panel: una sola columna, sin altura fija que corte */
+  .curiosity-top{
+    grid-template-columns:1fr;
+    gap:1.5rem;
+  }
+  .curiosity-panel.open{max-height:2000px}
+  .color-audio-block{
+    margin-top:0;
+    width:100%;
+  }
+  /* El waveform no se desborda en pantallas pequeñas */
+  .cap-waveform{height:22px}
 }
 
 @media(max-width:600px){
@@ -488,9 +498,14 @@ footer strong{font-style:normal;color:var(--gold);font-weight:400}
   .nav-toggle{display:flex}
   .hero-meta{gap:1rem;flex-direction:column;align-items:center}
   .palette-grid{grid-template-columns:repeat(5,1fr);gap:.5rem}
-  .curiosity-inner{padding:1.2rem 1.5rem}
+  .curiosity-inner{padding:1.2rem 1.2rem}
+  .curiosity-name{font-size:1.05rem}
+  .curiosity-text{font-size:.95rem}
   section{padding:3.5rem 1.2rem}
   #hero{padding:6rem 1.2rem 4rem}
   .timeline-list::before{display:none}
   .t-item,.t-item:nth-child(even){gap:1rem}
+  /* Reproductor más compacto en móvil */
+  .cap-play{width:34px;height:34px;font-size:.8rem}
+  .color-audio-block{padding:1rem 1rem}
 }
