@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pensamiento Creativo Nico</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet"/>
+
+  <!-- Hoja de estilos -->
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <header>
+    <div class="logo">Renacimiento del Norte</div>
+    <nav id="mainNav">
+      <a href="#obra">La Obra</a>
+      <a href="#paleta">Paleta</a>
+      <a href="#contexto">Contexto</a>
+      <a href="#timeline">Cronología</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ══ HERO ══ -->
+  <section id="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-deco"></div>
+    <div class="hero-content">
+      <p class="hero-label">Renacimiento del Norte de Europa · c. 1525</p>
+      <h1 class="hero-title">Cupid Complaining<br>to Venus</h1>
+      <p class="hero-subtitle">Nicolás Espinosa Restrepo</p>
+      <div class="hero-meta">
+        <span>Diseño estratégico</span>
+        <span>Universidad Colegiatura</span>
+        <span>Pensamiento Creativo</span>
+      </div>
+      <button class="scroll-cta" onclick="document.getElementById('obra').scrollIntoView({behavior:'smooth'})">
+        Explorar la obra
+      </button>
+    </div>
+  </section>
+
+  <!-- ══ SECCIÓN OBRA ══ -->
+  <section id="obra">
+    <div class="obra-grid">
+
+      <!-- Imagen fija de la obra -->
+      <div class="artwork-frame" id="artworkFrame">
+        <img id="artworkImg" src="images/image.jpg" alt="Cupid Complaining to Venus"/>
+      </div>
+
+      <!-- Información lateral -->
+      <div class="obra-info">
+        <div class="info-block" data-scroll>
+          <div class="info-label">Título</div>
+          <div class="info-value large">Cupid Complaining to Venus</div>
+        </div>
+        <div class="info-block" data-scroll>
+          <div class="info-label">Artista</div>
+          <div class="info-value">Lucas Cranach el Viejo (1472–1553)</div>
+        </div>
+        <div class="info-block" data-scroll>
+          <div class="info-label">Fecha</div>
+          <div class="info-value">c. 1525</div>
+        </div>
+        <div class="info-block" data-scroll>
+          <div class="info-label">Técnica</div>
+          <div class="info-value">Óleo sobre tabla de haya</div>
+        </div>
+        <div class="info-block" data-scroll>
+          <div class="info-label">Localización</div>
+          <div class="info-value">The National Gallery, Londres</div>
+        </div>
+        <div class="info-block" data-scroll>
+          <blockquote class="info-quote">
+            «Mientras el niño roba un panal de una colmena hueca, una abeja lo pica en el dedo.
+            Así el dios del amor aprende que el placer viene siempre acompañado del dolor.»
+            <br><br>— Teócrito, <em>Idylls</em> (fuente literaria de la obra)
+          </blockquote>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="ornament-divider">✦ &nbsp; &nbsp; ✦ &nbsp; &nbsp; ✦</div>
+
+  <!-- ══ SECCIÓN PALETA ══ -->
+  <section id="paleta">
+    <div class="paleta-header">
+      <h2 class="section-title">Paleta Cromática</h2>
+      <p class="section-sub">Selecciona un color para descubrir su sonido y un dato curioso de la obra</p>
+    </div>
+
+    <!-- Casillas de colores (generadas por JS) -->
+    <div class="palette-grid" id="paletteGrid"></div>
+    <p class="palette-hint">Cada tono habla de la maestría técnica de Cranach</p>
+
+    <!-- Panel expandible de curiosidad + audio -->
+    <div class="curiosity-panel" id="curiosityPanel">
+      <div class="curiosity-color-bar" id="curiosityBar"></div>
+      <div class="curiosity-inner">
+        <div class="curiosity-top">
+
+          <!-- Dato curioso -->
+          <div class="curiosity-left">
+            <div class="curiosity-label">Dato Curioso</div>
+            <div class="curiosity-name" id="curiosityName"></div>
+            <p class="curiosity-text" id="curiosityText"></p>
+          </div>
+
+          <!-- Reproductor de audio del color -->
+          <div class="color-audio-block" id="colorAudioBlock">
+            <div class="color-audio-title">♩ Sonido del Color</div>
+
+            <!-- Estado de carga: mientras el audio no está listo -->
+            <div class="color-audio-idle" id="colorAudioIdle">
+              <p class="color-audio-hint">Cargando audio...</p>
+            </div>
+
+            <!-- Estado activo: con audio listo -->
+            <div class="color-audio-player" id="colorAudioPlayer" style="display:none">
+              <div class="cap-controls">
+                <button class="cap-play" id="capPlayBtn">▶</button>
+                <div class="cap-info">
+                  <div class="cap-name" id="capName">—</div>
+                  <div class="cap-time" id="capTime">0:00 / 0:00</div>
+                </div>
+              </div>
+              <div class="cap-track" id="capTrack">
+                <div class="cap-progress" id="capProgress"></div>
+              </div>
+              <!-- Barras de forma de onda (generadas por JS) -->
+              <div class="cap-waveform" id="capWaveform"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ornament-divider">✦ &nbsp; &nbsp; ✦ &nbsp; &nbsp; ✦</div>
+
+  <!-- ══ SECCIÓN CONTEXTO ══ -->
+  <section id="contexto">
+    <div class="ctx-header" data-scroll
+      style="text-align:center;margin-bottom:3rem;opacity:0;transform:translateY(20px);transition:opacity .7s,transform .7s">
+      <h2 class="section-title">Contexto Histórico</h2>
+      <p class="section-sub">El universo pictórico del Renacimiento Septentrional</p>
+    </div>
+    <div class="contexto-grid">
+
+      <div class="ctx-block" data-scroll>
+        <div class="ctx-title">El Artista y su Época</div>
+        <div class="ctx-text">
+          <p>Lucas Cranach el Viejo fue uno de los pintores más prolíficos e influyentes del Renacimiento alemán. Nacido en Kronach (Baviera) en 1472, desarrolló su carrera principalmente en la corte del elector Federico III el Sabio de Sajonia, en <span class="highlight">Wittenberg</span>, donde ejerció como pintor oficial durante décadas.</p>
+          <p>A diferencia del Renacimiento italiano —dominado por la monumentalidad clásica—, el arte del norte de Europa conservó una <span class="highlight">intensidad emocional y detallismo meticuloso</span> heredados del gótico tardío, combinados con la nueva sensibilidad humanista.</p>
+          <p>Cranach fue amigo íntimo de Martín Lutero y un ferviente defensor de la Reforma Protestante. Este vínculo marcó profundamente su producción, aunque siguió pintando temas mitológicos con sensualidad refinada.</p>
+        </div>
+      </div>
+
+      <div class="ctx-block" data-scroll>
+        <div class="ctx-title">La Obra y su Significado</div>
+        <div class="ctx-text">
+          <p>La pintura ilustra el <span class="highlight">idilio XIX de Teócrito</span>, poeta griego del siglo III a.C.: Cupido intenta robar miel de una colmena y es atacado por las abejas. Corre a quejarse a su madre Venus, quien le responde con ironía que sus propias flechas también son pequeñas y causan un dolor desproporcionado.</p>
+          <p>Esta alegoría —<span class="highlight">"el amor es como la miel: dulce pero doloroso"</span>— era un tema recurrente en la poesía anacreóntica y fue adoptado con entusiasmo por los humanistas del norte europeo como emblema moral.</p>
+          <p>El paisaje boscoso típicamente germánico que enmarca la escena es un sello distintivo de Cranach: una naturaleza <span class="highlight">densa y misteriosa</span> muy distinta a los fondos arquitectónicos italianos.</p>
+        </div>
+      </div>
+
+      <div class="ctx-block" data-scroll>
+        <div class="ctx-title">Técnica y Composición</div>
+        <div class="ctx-text">
+          <p>Cranach pintó esta composición en varias versiones entre 1525 y 1545. La tabla del National Gallery es considerada la más refinada. El uso del <span class="highlight">óleo sobre tabla de haya</span> permitía una precisión casi miniaturista en los detalles: la textura de la piel, las hojas del bosque, el velo transparente de Venus.</p>
+          <p>La figura de Venus —esbelta, pálida, con un sombrero de ala ancha— responde al <span class="highlight">ideal de belleza nórdico</span> de Cranach: alejado de la rotundidad clásica mediterránea, más etéreo y ligeramente artificioso.</p>
+        </div>
+      </div>
+
+      <div class="ctx-block" data-scroll>
+        <div class="ctx-title">Influencia e Importancia</div>
+        <div class="ctx-text">
+          <p>La capacidad de Cranach para unir <span class="highlight">moralidad humanista con sensualidad pictórica</span> fue decisiva para el arte protestante alemán. Demostró que era posible pintar desnudos mitológicos sin contradecir los valores reformistas, al cargarlos de alegoría moral explícita.</p>
+          <p>La obra forma parte de las colecciones permanentes del National Gallery de Londres desde 1963 y es considerada uno de los mejores ejemplos del Renacimiento del Norte en colecciones británicas. Su conservación es <span class="highlight">excepcional</span>, preservando la vivacidad original de los pigmentos.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="ornament-divider">✦ &nbsp; &nbsp; ✦ &nbsp; &nbsp; ✦</div>
+
+  <!-- ══ SECCIÓN TIMELINE ══ -->
+  <section id="timeline">
+    <div class="timeline-title" data-scroll>
+      <h2 class="section-title">Cronología</h2>
+      <p class="section-sub">De Cranach al presente</p>
+    </div>
+    <div class="timeline-list" id="timelineList">
+
+      <div class="t-item" data-scroll>
+        <div class="t-year">1472</div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <div class="t-heading">Nacimiento de Lucas Cranach el Viejo</div>
+          <div class="t-text">Nace en Kronach, Baviera, en el seno de una familia de artesanos. Toma su nombre artístico de su ciudad natal.</div>
+        </div>
+      </div>
+
+      <div class="t-item" data-scroll>
+        <div class="t-year">1505</div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <div class="t-heading">Pintor de corte en Wittenberg</div>
+          <div class="t-text">Se instala en Wittenberg como pintor oficial de los Electores de Sajonia. Dirige un taller productivo con decenas de aprendices.</div>
+        </div>
+      </div>
+
+      <div class="t-item" data-scroll>
+        <div class="t-year">c.1517</div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <div class="t-heading">Amistad con Martín Lutero</div>
+          <div class="t-text">Se convierte en el principal propagandista visual de la Reforma Protestante. Retrata a Lutero en numerosas ocasiones y es padrino de su hija.</div>
+        </div>
+      </div>
+
+      <div class="t-item" data-scroll>
+        <div class="t-year">c.1525</div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <div class="t-heading">Cupid Complaining to Venus</div>
+          <div class="t-text">Pinta la versión considerada canónica de esta composición, basada en el Idilio XIX de Teócrito. La obra se repetirá en al menos cuatro versiones hasta 1545.</div>
+        </div>
+      </div>
+
+      <div class="t-item" data-scroll>
+        <div class="t-year">1553</div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <div class="t-heading">Muerte del artista</div>
+          <div class="t-text">Fallece en Weimar a los 81 años, uno de los artistas más longevos y prolíficos de su época, dejando más de 2.000 obras catalogadas.</div>
+        </div>
+      </div>
+
+      <div class="t-item" data-scroll>
+        <div class="t-year">1963</div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <div class="t-heading">Ingresa al National Gallery</div>
+          <div class="t-text">La tabla de Londres es adquirida por el National Gallery, donde actualmente se exhibe en la colección permanente de pintura alemana del siglo XVI.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <p>Proyecto editorial · <strong>Renacimiento del Norte</strong> · Lucas Cranach el Viejo · c. 1525</p>
+    <p style="margin-top:.4rem;font-size:.78rem">«Dum puer alveolo furatur mella Cupido» — Teócrito</p>
+  </footer>
+
+  <!-- Script principal (defer garantiza que el DOM esté listo) -->
+  <script src="main.js" defer></script>
+
+</body>
+</html>
